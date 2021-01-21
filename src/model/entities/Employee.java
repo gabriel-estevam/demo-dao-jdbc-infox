@@ -9,6 +9,7 @@ public class Employee implements Serializable
 	
 	private Integer id;
 	private String name;
+	private String cpf;
 	private Date BirthDate;
 	private String Email;
 	private Double BaseSalary;
@@ -19,10 +20,11 @@ public class Employee implements Serializable
 		
 	}
 
-	public Employee(Integer id, String name, Date birthDate, String email, Double baseSalary, Department departmentId) 
+	public Employee(Integer id, String name, String cpf, Date birthDate, String email, Double baseSalary, Department departmentId) 
 	{
 		this.id = id;
 		this.name = name;
+		this.cpf = cpf;
 		BirthDate = birthDate;
 		Email = email;
 		BaseSalary = baseSalary;
@@ -43,6 +45,16 @@ public class Employee implements Serializable
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	
+	
+	public String getCpf() {
+		return cpf;
+	}
+
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
 	}
 
 	public Date getBirthDate() {
@@ -104,7 +116,9 @@ public class Employee implements Serializable
 
 	@Override
 	public String toString() {
-		return "Employee [id=" + id + ", name=" + name + ", BirthDate=" + BirthDate + ", Email=" + Email
-				+ ", BaseSalary=" + BaseSalary + ", departmentId=" + departmentId + "]";
+		return "Employee [id=" + id + ", name=" + name + ", cpf=" + cpf + ", BirthDate=" + BirthDate + ", Email="
+				+ Email + ", BaseSalary=" + BaseSalary + ", departmentId=" + departmentId + "]";
 	}
+	
+	
 }

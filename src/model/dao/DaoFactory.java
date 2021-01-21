@@ -1,5 +1,6 @@
 package model.dao;
 
+import db.DB;
 import model.dao.impl.EmployeeDaoJDBC;
 
 public class DaoFactory 
@@ -21,6 +22,6 @@ public class DaoFactory
 	 *Sendo assim, acessamos a classe que implementa os metodos da interface
 	 * */
 	public static EmployeeDao createEmployeeDao() {
-		return new EmployeeDaoJDBC();
+		return new EmployeeDaoJDBC(DB.getConnection());
 	}
 }

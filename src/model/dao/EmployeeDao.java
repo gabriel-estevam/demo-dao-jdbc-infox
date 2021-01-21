@@ -14,4 +14,5 @@ public interface EmployeeDao
 	//Detalhe: Aquilo que conter byId tem como como parametro um inteiro para esse metodo
 	List<Employee> findAll(); //metodo responsavel por trazer todos os funcionarios do banco de dados,
 	//Detalhe: Aquilo que contem all, temos que armazenar em uma lista (list)
+	List<Employee> findByDepartmentId(Integer id);
 }
