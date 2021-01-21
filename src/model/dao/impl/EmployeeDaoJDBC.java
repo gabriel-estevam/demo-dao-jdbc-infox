@@ -64,18 +64,11 @@ public class EmployeeDaoJDBC implements EmployeeDao
 			
 			if(rs.next())
 			{
-				//Aqui vamos percorrre o ResultSet e enviar para os objetos os resultados obtidos
-				Department dep = new Department();
-				dep.setId(rs.getInt("Department_Id"));
-				dep.setName(rs.getString("Department_Name"));
-				Employee obj = new Employee();
-				obj.setId(rs.getInt("Employee_Id"));
-				obj.setName(rs.getString("Employee_Name"));
-				obj.setCpf(rs.getString("Employee_Cpf"));
-				obj.setBirthDate(rs.getDate("Employee_BirthDate"));
-				obj.setBaseSalary(rs.getDouble("Employee_BaseSalary"));
-				obj.setEmail(rs.getString("Employee_Email"));
-				obj.setDepartmentId(dep);
+			/*Aqui aplicamos os metodos de reutilização de codigo, portanto se algum
+			 * outro metodo venha ter relação com department ou employee, cria uma variavel
+			 * e chama o metodo*/
+				Department dep = instantiateDepartment(rs);
+				Employee obj = instantiateEmployee(dep, rs); 
 				return obj; //retona o obj
 			}
 			return null; //caso não tenha nada na tabela (resultSet) retorna nulo
@@ -102,5 +95,35 @@ public class EmployeeDaoJDBC implements EmployeeDao
 	public List<Employee> findByDepartmentId(Integer id) {
 		return null;
 	}
-
+	
+	private Employee instantiateEmployee(Department dep, ResultSet rs) throws SQLException 
+	{
+		/*Metodo para reutilização de codigo, tem como parametro um Departamento e um
+		 * ResultSet do banco nesse metodo instanciamos  um objeto do tipo Employee e 
+		 * setamos os valores obtido do resultset
+		*/
+		Employee obj = new Employee();
+		obj.setId(rs.getInt("Employee_Id"));
+		obj.setName(rs.getString("Employee_Name"));
+		obj.setCpf(rs.getString("Employee_Cpf"));
+		obj.setBirthDate(rs.getDate("Employee_BirthDate"));
+		obj.setBaseSalary(rs.getDouble("Employee_BaseSalary"));
+		obj.setEmail(rs.getString("Employee_Email"));
+		obj.setDepartmentId(dep);
+		return obj;
+	}
+	
+	private Department instantiateDepartment(ResultSet rs) throws SQLException
+	{
+		/*Metodo para reutilização de codigo, nesse metodo 
+		 * temos como parametro um ResultSet que o SELECT retorna
+		 * Instanciamos um objeto do tipo department, e setamos os valores
+		 * obtido do ResultSet, esse metodo pode gerar uma execeção, então ela é 
+		 * propagada no metodo
+		*/
+		Department dep = new Department();
+		dep.setId(rs.getInt("Department_Id"));
+		dep.setName(rs.getString("Department_Name"));
+		return dep;
+	}
 }

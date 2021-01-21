@@ -10,6 +10,7 @@ public class Program
 	{
 		EmployeeDao employeeDao = DaoFactory.createEmployeeDao();
 		Employee employee = employeeDao.findById(5);
+		System.out.println("=== Test 1 findById ===");
 		System.out.println(employee);
 	}
 }
