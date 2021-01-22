@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import db.DB;
 import db.DbException;
@@ -92,8 +95,59 @@ public class EmployeeDaoJDBC implements EmployeeDao
 	}
 
 	@Override
-	public List<Employee> findByDepartmentId(Integer id) {
-		return null;
+	public List<Employee> findByDepartmentId(Department department) 
+	{
+		// metodo que retorna todos os funcionarios de um determinado departmento
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try 
+		{
+			st = conn.prepareStatement(
+					"SELECT emp.*,\r\n" + 
+					"	   dep.Department_Name\r\n" + 
+					"FROM tb_employee AS emp\r\n" + 
+					"INNER JOIN tb_department AS dep\r\n" + 
+					"ON emp.Department_Id = dep.Department_Id\r\n" + 
+					"WHERE dep.Department_Id = ?\r\n" + 
+					"ORDER BY dep.Department_Name;"
+					);
+			st.setInt(1, department.getId()); //passa o valor do id obtido da query
+			rs = st.executeQuery();
+
+			List<Employee> list = new ArrayList<>(); //lista para armazenar os funcionarios
+			Map<Integer, Department> map = new HashMap<>(); //vai fazer o mapeamento dos objetos do tipo department, 
+	//para que não acontece de ficar instanciando um novo department para cada funcionario
+			while(rs.next())
+			{
+				//while vai percorre o resultSet quando true
+				
+				Department dep = map.get(rs.getInt("Department_Id")); //essa variavel vai armazenar objeto departmento 
+//para cada department que ele encontrar na coluna Department_Id do ResultSet, isso atraves do map.get, então antes o metodo get
+//vai tentar fazer a busca na coluna department o id do resultSet (rs da estrutura while), caso ele não encontre retora null
+//para a variavel, se null dai sim instanciamos um novo objeto do tipo Department
+//se não fizermos isso vai ficar instanciando um novo deparmento para cada funcionario, mesmo estando no mesmo departmento
+				if(dep == null)
+				{
+					//esse bloco verifica se o department é nulo, caso seja 
+					dep = instantiateDepartment(rs); //instancia um novo departmento
+					map.put(rs.getInt("Department_Id"), dep); //depois de instanciado armazena no map, o valor
+					//do id do departamento (chave) e seu objeto (valor)
+				}
+				
+				Employee obj = instantiateEmployee(dep, rs); //instancia um novo funcionario
+				list.add(obj); //adiciona na lista um funcionario
+			}
+			return list; //retorna a lista de funcinarios
+		} 
+		catch (SQLException e) 
+		{
+			throw new DbException(e.getMessage());
+		}
+		finally
+		{
+			DB.closeResultSet(rs);
+			DB.closeStatement(null);
+		}
 	}
 	
 	private Employee instantiateEmployee(Department dep, ResultSet rs) throws SQLException 
