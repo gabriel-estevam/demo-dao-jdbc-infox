@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,9 +29,52 @@ public class EmployeeDaoJDBC implements EmployeeDao
 
 	//essa classe implementa todos os metodos de acesso a dados de um funcionario
 	@Override
-	public void insert(Employee obj) {
-		// TODO Auto-generated method stub
-		
+	public void insert(Employee obj) 
+	{
+		//metodo para inserir um novo funcionario no banco de dados, os dados do funcionario ja vem direto
+		//do objeto do parametro
+		PreparedStatement st = null;
+		try 
+		{
+			st = conn.prepareStatement(
+					"INSERT INTO tb_employee "
+					+ "(Employee_Name, Employee_cpf, Employee_BirthDate , Employee_BaseSalary, Employee_Email, Department_Id)\r\n"
+					+ "VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS); //esse metodo alem de executar o insert, tambem vai gerar
+			//a chave gera da inserção, para podermos usar para sertar o id daquele funcionario no objeto
+			st.setString(1, obj.getName());
+			st.setString(2, obj.getCpf());
+			st.setDate(3, new java.sql.Date(obj.getBirthDate().getTime()));
+			st.setDouble(4, obj.getBaseSalary());
+			st.setString(5, obj.getEmail());
+			st.setInt(6, obj.getDepartmentId().getId());
+			
+			int rowsAffected = st.executeUpdate(); //executa o insert se deu certo retona 1, caso contrario 0
+			
+			if(rowsAffected > 0) // se o insert deu certo a variavel rowsAffected sera maior que 0
+			{
+				ResultSet rs = st.getGeneratedKeys(); //essa variavel vai receber o valor da chave gerada para o registro
+				//o retorno desse metodo é um resultSet porque ele gera apenas uma coluna (não é a employee_Id)
+				if(rs.next()) //se o resultSet é true
+				{
+					int id = rs.getInt(1); //declarado uma variavel para setar o id do funcionario, atraves da variavel
+				 //rs vamos acessar a "coluna" que esta o Id, pegando o seu valor gerado
+					obj.setId(id); //seta o id para o objeto
+				}
+				DB.closeResultSet(rs); //fecha a conexão com ResultSet
+			}
+			else
+			{
+				throw new DbException("Unexpected error! No rows affected"); //Caso a execução tenha falhado lança uma exceção
+			}
+		} 
+		catch (SQLException e) 
+		{
+			throw new DbException(e.getMessage());
+		}
+		finally
+		{
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override

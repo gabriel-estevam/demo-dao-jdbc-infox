@@ -1,5 +1,6 @@
 package application;
 
+import java.util.Date;
 import java.util.List;
 
 import model.dao.DaoFactory;
@@ -18,7 +19,7 @@ public class Program
 		System.out.println(employee);
 		
 		System.out.println("\n=== Test 2 findByDepartementId ===");
-		Department dep = new Department(2, null);
+		Department dep = new Department(3, null);
 		List<Employee>list =  employeeDao.findByDepartmentId(dep);
 		for(Employee obj : list) {
 			System.out.println(obj);
@@ -28,5 +29,10 @@ public class Program
 		for(Employee obj : list) {
 			System.out.println(obj);
 		}
+		
+		Employee newEmployee = new Employee(null,"Maria", "345.345.345-00", new Date(),"maria@gmail.com",1000.0,dep);
+		employeeDao.insert(newEmployee);
+		System.out.println("\n=== Test 4 Insert new employee ===");
+		System.out.println("Inserted! New id = " + newEmployee.getId());
 	}
 }
