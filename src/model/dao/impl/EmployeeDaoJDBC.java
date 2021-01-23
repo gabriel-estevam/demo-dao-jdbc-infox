@@ -89,9 +89,56 @@ public class EmployeeDaoJDBC implements EmployeeDao
 	}
 
 	@Override
-	public List<Employee> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Employee> findAll() 
+	{
+		//metodo que retorna todos os funcionarios e seu respectivo departamento
+		//tem o mesmo funcionamento que o metodo findByDepartmentId com diferença do 
+		//script sql
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try 
+		{
+			st = conn.prepareStatement(
+					"SELECT emp.*,\r\n" + 
+					"	dep.Department_Name\r\n" + 
+					"FROM tb_employee AS emp\r\n" + 
+					"INNER JOIN tb_department AS dep\r\n" + 
+					"ON emp.Department_Id = dep.Department_Id\r\n" + 
+					"ORDER BY emp.Employee_Name;"
+					);
+			rs = st.executeQuery();
+			
+			List<Employee> list = new ArrayList<>();//lista para armazenar o resultado
+			Map<Integer, Department> map = new HashMap<>();//map para fazer o mapeamento de departmentos
+			
+			while(rs.next())
+			{
+				//nesse while estamos percorrendo o resultSet gerado
+				Department dep = map.get(rs.getInt("Department_Id")); // aqui começa o mapeamento atraves do metodo get
+//dentro do metodo estamos percorrendo a coluna departmentId, esse metodo retorna null quando não econtra nada nada na sua chave 
+//portanto, o map vai verificar se ele tem um chave (key) que é o id do departamento e seu id correspondente, caso não encotre instancia
+// um novo objeto, caso encontre não instancia apenas aponta qual o objeto pertence aquela chave
+				if(dep == null)
+				{
+					//nesse if estamos verificando se o objeto department é nulo, caso seja é instanciado um departmento
+					//e armazenado na chave do mapeamento o valor do id e seu respectivo objeto
+					dep = instantiateDepartment(rs);
+					map.put(rs.getInt("Department_Id"), dep);
+				}
+				Employee obj = instantiateEmployee(dep, rs); //instancia um novo objeto do tipo Employee
+				list.add(obj); //adiciona na lista o objeto (funcionario)
+			}
+			return list;
+		} 
+		catch (SQLException e) 
+		{
+			throw new DbException(e.getMessage());
+		}
+		finally
+		{
+			DB.closeResultSet(rs);
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
