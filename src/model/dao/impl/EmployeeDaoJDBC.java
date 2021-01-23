@@ -12,6 +12,7 @@ import java.util.Map;
 
 import db.DB;
 import db.DbException;
+import db.DbIntegrityException;
 import model.dao.EmployeeDao; //essa camada, criamos classes que implementa os metodos de acesso ao banco de daos
 import model.entities.Department;
 import model.entities.Employee;
@@ -115,13 +116,30 @@ public class EmployeeDaoJDBC implements EmployeeDao
 	}
 
 	@Override
-	public void deleteById(Integer id) {
-		// TODO Auto-generated method stub
-		
+	public void deleteById(Integer id) 
+	{
+		//Metodo para deletar um registro da tabela
+		PreparedStatement st = null;
+		try 
+		{
+			st = conn.prepareStatement(
+					"DELETE FROM tb_employee WHERE Employee_Id = ?");
+			st.setInt(1, id);
+			st.executeUpdate();
+		}
+		catch (SQLException e) 
+		{
+			throw new DbIntegrityException(e.getMessage());
+		}
+		finally
+		{
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
-	public Employee findById(Integer id) {
+	public Employee findById(Integer id) 
+	{
 		//vai retorna um resultSet do select abaixo,
 		//esse resultSet Preenche os atributos dos objetos abaixo
 		PreparedStatement st = null;
@@ -134,8 +152,7 @@ public class EmployeeDaoJDBC implements EmployeeDao
 					"FROM tb_employee as emp\r\n" + 
 					"INNER JOIN tb_department as dep\r\n" + 
 					"ON emp.Department_Id = dep.Department_Id\r\n" + 
-					"WHERE emp.Employee_Id = ?;"
-				);
+					"WHERE emp.Employee_Id = ?;");
 			st.setInt(1, id);//passado como parametro, valor 1, que é o primeiro interroga na query acima, e o Id
 			//que for informado no metodo
 			rs = st.executeQuery(); //executa a query e retorna o ResultSet
