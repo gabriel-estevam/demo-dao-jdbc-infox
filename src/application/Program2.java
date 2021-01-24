@@ -14,6 +14,7 @@ public class Program2
 		//classe para testar os metodos
 		DepartmentDao departmentDao = DaoFactory.createDepartmentDao();
 		Department dep = departmentDao.findById(3);
+		
 		System.out.println("==Test DepartmentById==");
 		System.out.println(dep);
 		
@@ -23,9 +24,15 @@ public class Program2
 		for(Department obj : list){
 			System.out.println(obj);
 		}
-		Department newDepartment = new Department(null, "Financeiro");
+		Department newDepartment = new Department(null, "Financeiro III");
 		System.out.println("==Test 3 insert==");
 		departmentDao.insert(newDepartment);
 		System.out.println("Inserted new id = " + newDepartment.getId());
+		
+		System.out.println("\n==Test 4 update");
+		dep = departmentDao.findById(4);
+		dep.setName("Suprimentos");
+		departmentDao.update(dep);
+		System.out.println("Updated completed");
 	}
 }
