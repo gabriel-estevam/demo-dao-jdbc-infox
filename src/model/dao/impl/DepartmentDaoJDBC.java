@@ -10,6 +10,7 @@ import java.util.List;
 
 import db.DB;
 import db.DbException;
+import db.DbIntegrityException;
 import model.dao.DepartmentDao;
 import model.entities.Department;
 
@@ -85,9 +86,24 @@ public class DepartmentDaoJDBC implements DepartmentDao
 	}
 
 	@Override
-	public void deleteById(Integer id) {
-		// TODO Auto-generated method stub
-		
+	public void deleteById(Integer id) 
+	{
+		//Metodo para deletar um registro do banco de dados pelo seu Id, tem como parametro um interger que vai receber o Id do departamento a ser deletado	
+		PreparedStatement st = null;
+		try
+		{
+			st = conn.prepareStatement("DELETE FROM tb_department WHERE Department_Id = ? ");
+			st.setInt(1, id);
+			st.executeUpdate();
+		} 
+		catch (SQLException e) 
+		{
+			throw new DbIntegrityException(e.getMessage());
+		}
+		finally
+		{
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
