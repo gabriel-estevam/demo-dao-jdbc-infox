@@ -23,5 +23,9 @@ public class Program2
 		for(Department obj : list){
 			System.out.println(obj);
 		}
+		Department newDepartment = new Department(null, "Financeiro");
+		System.out.println("==Test 3 insert==");
+		departmentDao.insert(newDepartment);
+		System.out.println("Inserted new id = " + newDepartment.getId());
 	}
 }

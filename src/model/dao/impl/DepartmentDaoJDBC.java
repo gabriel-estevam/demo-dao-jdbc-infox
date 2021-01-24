@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +25,43 @@ public class DepartmentDaoJDBC implements DepartmentDao
 	}
 	
 	@Override
-	public void insert(Department obj) {
-		// TODO Auto-generated method stub
+	public void insert(Department obj) 
+	{
+		//metodo para fazer a inserção no banco de dados, tem como parametro um objeto do tipo Department
+		PreparedStatement st = null;
 		
+		try 
+		{
+			st = conn.prepareStatement("INSERT INTO tb_department(Department_Name) VALUES(?) ",Statement.RETURN_GENERATED_KEYS);
+			//esse comando faz a inserção e retorna o valor do seu Id gerado
+			st.setString(1, obj.getName()); //seta o nome do departmento para o banco
+			int rowsAffected =  st.executeUpdate(); //executa o comando e armazena na variavel "rowsAffected" um valor interior 0 ou 1
+			
+			if(rowsAffected > 0) //se o valor for maior do que 0, segnifica que executou
+			{
+				ResultSet rs = st.getGeneratedKeys(); //Essa variavel recebe o ResultSet do id que o insert gerou
+				
+				while(rs.next()) //navega a coluna do id gerado
+				{
+					int id = rs.getInt(1); //esse variavel armazena o id que ele encotrou na inserção
+					obj.setId(id); //seta para o objeto seu id
+				}
+				
+				DB.closeResultSet(rs); //fecha a conexão com resultSet que abrimos nesse bloco
+			}
+			else
+			{
+				throw new DbException("Unexpected error! No rows affected");
+			}
+		} 
+		catch (SQLException e) 
+		{
+			throw new DbException(e.getMessage());
+		}
+		finally
+		{
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
