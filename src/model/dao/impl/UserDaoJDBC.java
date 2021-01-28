@@ -64,9 +64,33 @@ public class UserDaoJDBC implements UserDao
 	}
 
 	@Override
-	public void update(User obj) {
-		// TODO Auto-generated method stub
-		
+	public void update(User obj) 
+	{
+		// metodo para atualizar uma informação do usuario, tem como parametro um objeto do tipo User
+		PreparedStatement st = null;
+		try 
+		{
+			st = conn.prepareStatement(
+					"UPDATE tb_User SET User_Name = ?, \r\n" + 
+					"				    User_Login = ?,\r\n" + 
+					"                   User_Password = ?,\r\n" + 
+					"                   User_Category = ?\r\n" + 
+					"WHERE User_Id = ? "); //script para executar a atualização
+			//as linhas abaixo seta os valores, atraves dos metodos do objeto do parametro
+			st.setString(1, obj.getName());
+			st.setString(2, obj.getLogin());
+			st.setString(3, obj.getPassword());
+			st.setString(4, obj.getCategory());
+			st.setInt(5, obj.getId());
+			
+			st.executeUpdate(); //executa o script
+		} 
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override

@@ -26,9 +26,16 @@ public class Program3
 			System.out.println(obj);
 		}
 		
-		User newUser = new User(null, "Administrador", "admin", "admin", "administrador");
+		User newUser = new User(null, "Usuario Teste", "teste4", "teste", "administrador");
 		System.out.println("\n==Test 3 insert==");
 		userDao.insert(newUser);
 		System.out.println("Inserted! new Id = "+ newUser.getId());
+		
+		user = userDao.findById(7);
+		user.setLogin("sistema.acesso");
+		user.setName("Administrador");
+		userDao.update(user);
+		System.out.println("\n==Test 4 update==");
+		System.out.println("Updated completed");
 	}
 }

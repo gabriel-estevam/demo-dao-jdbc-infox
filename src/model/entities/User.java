@@ -16,11 +16,11 @@ public class User implements Serializable
 		
 	}
 
-	public User(Integer id, String login, String name, String password, String category) 
+	public User(Integer id, String name,String login,String password, String category) 
 	{	
 		this.id = id;
-		this.login = login;
 		this.name = name;
+		this.login = login;
 		this.password = password;
 		this.category = category;
 	}
