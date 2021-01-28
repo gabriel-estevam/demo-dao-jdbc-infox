@@ -25,5 +25,10 @@ public class Program3
 		for(User obj : userList) {
 			System.out.println(obj);
 		}
+		
+		User newUser = new User(null, "Administrador", "admin", "admin", "administrador");
+		System.out.println("\n==Test 3 insert==");
+		userDao.insert(newUser);
+		System.out.println("Inserted! new Id = "+ newUser.getId());
 	}
 }

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +22,45 @@ public class UserDaoJDBC implements UserDao
 	}
 	
 	@Override
-	public void insert(User obj) {
-		// TODO Auto-generated method stub
-		
+	public void insert(User obj) 
+	{
+		// Metodo para inserir um usuario no sistema, tem como parametro um objeto do tipo User
+		PreparedStatement st = null;
+		try 
+		{
+			st = conn.prepareStatement(
+					"INSERT INTO tb_User(User_Name, User_Login, User_Password, User_Category)\r\n" 
+					+ "				VALUES(?,?,?,?) ", Statement.RETURN_GENERATED_KEYS); //script para inserir um usuario,
+//esse metodo tambem retorna o Id do registro, que é gerado na aplicação com base no ultimo id que tem no banco
+//detalhe inportante é que esse metodo seta para objeto na aplicação o valor do Id, pois no banco esse campo é auto_increment
+			//set os valores para banco, esses valores acessamos atraves do objeto que esta no parametro do metodo
+			st.setString(1, obj.getName());
+			st.setString(2, obj.getLogin());
+			st.setString(3, obj.getPassword());
+			st.setString(4, obj.getCategory());
+			
+			int rowsAffected = st.executeUpdate(); //executa o script e amarzena o valor de retono na variavel
+			
+			if(rowsAffected > 0) //se o valor da variavel for maior que 0, funcionou 
+			{
+				ResultSet rs = st.getGeneratedKeys(); //objeto vai guardar o valor da chave gerada na inserção
+				while(rs.next()) {
+					//acessa as chaves gerada
+					int id = rs.getInt(1); //pega o valor da chave que gerou
+					obj.setId(id); //seta para objeto o id
+				}
+				DB.closeResultSet(rs);
+			}
+			else{
+				throw new DbException("Unexpected error! No rows affected");
+			}
+		} 
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
