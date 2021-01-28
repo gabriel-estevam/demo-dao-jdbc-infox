@@ -94,9 +94,22 @@ public class UserDaoJDBC implements UserDao
 	}
 
 	@Override
-	public void deleteById(Integer id) {
-		// TODO Auto-generated method stub
-		
+	public void deleteById(Integer id) 
+	{
+		//Metodo para deletar um usuario pelo seu id, tem como parametro um integer id
+		PreparedStatement st = null;
+		try 
+		{
+			st = conn.prepareStatement("DELETE FROM tb_user WHERE User_Id = ?");
+			st.setInt(1, id); //seta o id do registro a ser deletado
+			st.executeUpdate();
+		} 
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
