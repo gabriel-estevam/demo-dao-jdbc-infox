@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import db.DB;
@@ -73,9 +74,38 @@ public class UserDaoJDBC implements UserDao
 	}
 
 	@Override
-	public List<User> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<User> findAll() 
+	{
+		// Metodo que retorna todos os usuarios cadastrados, retona uma lista do tipo User
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement("SELECT * FROM tb_User ORDER BY User_Name ");
+			rs = st.executeQuery();
+		
+			List<User> list = new ArrayList<>();
+			
+			while(rs.next())
+			{
+				User user = new User();
+				user.setId(rs.getInt("User_Id"));
+				user.setName(rs.getString("User_Name"));
+				user.setLogin(rs.getString("User_Login"));
+				user.setPassword(rs.getNString("User_Password"));
+				user.setCategory(rs.getString("User_Category"));
+				list.add(user);
+			}
+			return list;
+		} 
+		catch (SQLException e) 
+		{
+			throw new DbException(e.getMessage());
+		}
+		finally 
+		{
+			DB.closeResultSet(rs);
+			DB.closeStatement(st);
+		}
 	}
 
 }
