@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import db.DB;
@@ -71,9 +72,33 @@ public class ClientDaoJDBC implements ClientDao {
 	}
 
 	@Override
-	public List<Client> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Client> findAll() 
+	{
+		// Metodo que retorna todos os clientes, vai retorna uma lista de clientes
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		
+		try {
+			st = conn.prepareStatement("SELECT * FROM tb_Client ORDER BY Client_Name"); //prepara a query que vai retornar todos os clientes
+			rs = st.executeQuery(); //executa a query
+			
+			List<Client> list = new ArrayList<>(); //instanciado um lista do tipo client para armazenar e retorna os clientes
+			
+			while(rs.next()) {
+			//esse bloco vai percorrer o ResultSet e para cada registro vai instanciar um objeto do tipo client e
+			//adicionar na lista
+				Client obj = instanciateClient(rs); //instancia um objeto para cada registro
+				list.add(obj); //adiciona na lista o objeto
+			}
+			return list; // apos percorrer o ResultSet, retorna a lista com todos os objetos carregados
+		}
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeResultSet(rs);
+			DB.closeStatement(st);
+		}
 	}
 
 	private Client instanciateClient(ResultSet rs) throws SQLException {
