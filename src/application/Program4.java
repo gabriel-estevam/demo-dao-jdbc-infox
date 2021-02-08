@@ -26,5 +26,10 @@ public class Program4
 		for(Client obj : list) {
 			System.out.println(obj);
 		}
+		
+//		Client newClient = new Client(null, "Paulo barbosa", "Rua natal, 34","Brasilia","Salto", "São Paulo", "11934342311", "S", "paulo@gmail.com");
+//		System.out.println("\n==Test 3 insert==");
+//		clientDao.insert(newClient);
+//		System.out.println("Inserted! New id = " + newClient.getId());
 	}
 }

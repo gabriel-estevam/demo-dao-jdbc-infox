@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,9 +24,47 @@ public class ClientDaoJDBC implements ClientDao {
 	}
 
 	@Override
-	public void insert(Client obj) {
-		// TODO Auto-generated method stub
-
+	public void insert(Client obj) 
+	{
+		//metoodo para inserir um cliente, temo como parametro um objeto tipo client
+		PreparedStatement st = null;
+		try {
+			st = conn.prepareStatement("INSERT INTO tb_Client "
+					+ " (Client_Name, Client_Address, Client_Bairro, Client_City, Client_Estado, Client_Phone, Client_Whatsapp, Client_Email) "  
+					+" VALUES(?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS); //query para executar a inserção
+		//e retorna a chave de registro (id) da iserção, sera gerado para cada registro que houver
+			//as linhas abaixo seta as informações para a query
+			st.setString(1, obj.getName());
+			st.setString(2, obj.getAddress());
+			st.setString(3, obj.getBairro());
+			st.setString(4, obj.getCity());
+			st.setString(5, obj.getEstado());
+			st.setString(6, obj.getPhone());
+			st.setString(7, obj.getWhatsapp());
+			st.setString(8, obj.getEmail());
+			
+			int rowsAffected = st.executeUpdate(); //executa a inserção e guardar o resultado em uma variavel do tipo int
+			
+			if(rowsAffected > 0 ) {
+			//executa esse bloco caso a variavel seja maior que zero, indicando que funcionou
+				ResultSet rs = st.getGeneratedKeys(); //aqui pegamos a chave que foi gerada para inserção do registro
+				if(rs.next()) {
+				//esse bloco acessa a coluna do Id do registro 
+					int id = rs.getInt(1); //salva o Id gerado em uma variavel do tipo int
+					obj.setId(id); //seta o valor parao objeto, aqui é para o objeto porque no banco ja possui esse id, mas a classe, no atributo id, ainda não
+				}
+				DB.closeResultSet(rs);
+			}
+			else {
+				throw new DbException("Unexpected error! No rows affected");
+			}
+		} 
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
