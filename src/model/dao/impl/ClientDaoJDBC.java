@@ -10,6 +10,7 @@ import java.util.List;
 
 import db.DB;
 import db.DbException;
+import db.DbIntegrityException;
 import model.dao.ClientDao;
 import model.entities.Client;
 
@@ -106,9 +107,22 @@ public class ClientDaoJDBC implements ClientDao {
 	}
 
 	@Override
-	public void deleteById(Integer id) {
-		// TODO Auto-generated method stub
-
+	public void deleteById(Integer id) 
+	{
+		// metodo para deletar um registro (client) do banco de dados, tem como parametro um Integer
+		PreparedStatement st = null;
+		try 
+		{
+			st = conn.prepareStatement("DELETE FROM tb_client WHERE client_Id = ?");
+			st.setInt(1, id);
+			st.executeUpdate();
+		} 
+		catch (SQLException e) {
+			throw new DbIntegrityException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
