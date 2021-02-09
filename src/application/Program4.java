@@ -31,5 +31,11 @@ public class Program4
 //		System.out.println("\n==Test 3 insert==");
 //		clientDao.insert(newClient);
 //		System.out.println("Inserted! New id = " + newClient.getId());
+		
+		System.out.println("\n==Test 4 update==");
+		client = clientDao.findById(2);
+		client.setEmail("selena@gmail.com");
+		clientDao.update(client);
+		System.out.println("Updated completed");
 	}
 }

@@ -68,9 +68,41 @@ public class ClientDaoJDBC implements ClientDao {
 	}
 
 	@Override
-	public void update(Client obj) {
-		// TODO Auto-generated method stub
-
+	public void update(Client obj) 
+	{
+		// Metodo para atulizar um registro (client) no banco de dados, tem como parametro um objeto do tipo Client
+		PreparedStatement st = null;
+		
+		try 
+		{
+			st = conn.prepareStatement("UPDATE tb_client \r\n" + 
+					"SET Client_Name = ?,\r\n" + 
+					"	 Client_Address = ?,\r\n" + 
+					"    Client_Bairro = ?,\r\n" + 
+					"    Client_City = ?,\r\n" + 
+					"    Client_Estado = ?,\r\n" + 
+					"    Client_Phone = ?,\r\n" + 
+					"    Client_Whatsapp = ?,\r\n" + 
+					"    Client_Email = ?\r\n" + 
+					"WHERE Client_Id = ?;\r\n");
+			st.setString(1, obj.getName());
+			st.setString(2, obj.getAddress());
+			st.setString(3, obj.getBairro());
+			st.setString(4, obj.getCity());
+			st.setString(5, obj.getEstado());
+			st.setString(6, obj.getPhone());
+			st.setString(7, obj.getWhatsapp());
+			st.setString(8, obj.getEmail());
+			st.setInt(9, obj.getId());
+			
+			st.executeUpdate();
+		} 
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
