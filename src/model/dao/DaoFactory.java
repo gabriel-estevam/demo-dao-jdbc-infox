@@ -4,6 +4,7 @@ import db.DB;
 import model.dao.impl.ClientDaoJDBC;
 import model.dao.impl.DepartmentDaoJDBC;
 import model.dao.impl.EmployeeDaoJDBC;
+import model.dao.impl.ServiceDaoJDBC;
 import model.dao.impl.UserDaoJDBC;
 
 public class DaoFactory 
@@ -38,5 +39,9 @@ public class DaoFactory
 	
 	public static ClientDao createClientDao() {
 		return new ClientDaoJDBC(DB.getConnection());
+	}
+	
+	public static ServiceDao createServiceDao() {
+		return new  ServiceDaoJDBC(DB.getConnection());
 	}
 }
