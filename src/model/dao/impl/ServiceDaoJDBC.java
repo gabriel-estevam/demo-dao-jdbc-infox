@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +22,42 @@ public class ServiceDaoJDBC  implements ServiceDao{
 	}
 	
 	@Override
-	public void insert(Service obj) {
-		// TODO Auto-generated method stub
-		
+	public void insert(Service obj) 
+	{
+		//Metodo para inserir um serviço na tabela de serviços
+		PreparedStatement st = null;
+		try 
+		{
+			st = conn.prepareStatement("INSERT INTO tb_service(Service_Name, Service_Valor ,Service_Descricao) "  
+					+"VALUES(?, ?, ? )", Statement.RETURN_GENERATED_KEYS); //query para inserir um serviço,apos a inserção retorna o id gerado
+			//abaixo estamos setando os valores a serem inseridos
+			st.setString(1, obj.getName());
+			st.setDouble(2, obj.getValor());
+			st.setString(3, obj.getDescricao());
+			
+			int rowsAffected = st.executeUpdate(); //executa a query e guarda o valor de execução, que é um int, na variavel
+			
+			if(rowsAffected > 0) 
+			{
+			//esse bloco verifica se a execução da query funcionou
+				ResultSet rs = st.getGeneratedKeys(); //pega o id do registro que foi e armazena no objeto ResultSet
+				if(rs.next()) {
+				//esse bloco acessa o ResultSet 
+					int id = rs.getInt(1); //pega o id gerado
+					obj.setId(id); //seta o id para objeto
+				}
+				DB.closeResultSet(rs); //fecha a conexão com ResultSet
+			}
+			else {
+				throw new DbException("Unexpected error! No rows affected");
+			}
+		} 
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
