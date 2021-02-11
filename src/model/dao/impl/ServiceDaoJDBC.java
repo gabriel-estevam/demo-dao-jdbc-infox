@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import db.DB;
@@ -71,9 +72,36 @@ public class ServiceDaoJDBC  implements ServiceDao{
 	}
 
 	@Override
-	public List<Service> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Service> findAll() 
+	{
+		//Metodo para retorna todos os serviços cadastrado, vai retornar uma lista do tipo Service
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try 
+		{
+			st = conn.prepareStatement("SELECT * FROM tb_service ORDER BY Service_Name "); //query para retornar todos os serviços
+			rs = st.executeQuery(); //executa a query e armazena o resultado no objeto ResultSet
+			List<Service> list = new ArrayList<>(); //lista para armazenar os serviços
+			
+			while(rs.next())
+			{
+				//esse bloco vai percorrer o ResultSet e instanciar um objeto Service setar o valor e adicinar na lista
+				Service obj = new Service(); //instancia um service e abaixo seta os valores para o objeto
+				obj.setId(rs.getInt("Service_Id"));
+				obj.setName(rs.getString("Service_Name"));
+				obj.setValor(rs.getDouble("Service_Valor"));
+				obj.setDescricao(rs.getString("Service_Descricao"));
+				list.add(obj); //adiciona o objeto na lista, para cada registro um novo objeto
+			}
+			return list; //retonar a lista apos percorrer todo o ResulSet
+		} 
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeResultSet(rs);
+			DB.closeStatement(st);
+		}
 	}
 
 }
