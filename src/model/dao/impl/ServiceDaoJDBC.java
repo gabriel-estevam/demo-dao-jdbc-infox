@@ -61,9 +61,31 @@ public class ServiceDaoJDBC  implements ServiceDao{
 	}
 
 	@Override
-	public void update(Service obj) {
-		// TODO Auto-generated method stub
-		
+	public void update(Service obj) 
+	{
+		// Metodo para atualizar um registro (serviço) do banco de dados
+		PreparedStatement st = null;
+		try 
+		{
+			st = conn.prepareStatement(
+					"  UPDATE tb_service " 
+					+" SET Service_Name = ?, " 
+					+"	   Service_Valor = ?, "  
+					+"     Service_Descricao = ? " 
+					+" WHERE Service_Id = ? "); //query para alterar um registro pelo seu id
+			//seta as infomações para a query
+			st.setString(1, obj.getName());
+			st.setDouble(2, obj.getValor());
+			st.setString(3, obj.getDescricao());
+			st.setInt(4, obj.getId());
+			st.executeUpdate(); //executa a query
+		} 
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override

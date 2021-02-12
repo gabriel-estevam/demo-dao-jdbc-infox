@@ -29,5 +29,11 @@ public class Program5
 		Service newService = new Service(null, "Troca da tela Moto G5", "Troca tela Motorola Moto G5", 250.0);
 		serviceDao.insert(newService);
 		System.out.println("Inserted! New id = "+ newService.getId());
+		
+		System.out.println("\n==Test update");
+		service = serviceDao.findById(4);
+		service.setValor(245.00);
+		serviceDao.update(service);
+		System.out.println("Updated completed");
 	}
 }
