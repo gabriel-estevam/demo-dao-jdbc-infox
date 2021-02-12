@@ -10,6 +10,7 @@ import java.util.List;
 
 import db.DB;
 import db.DbException;
+import db.DbIntegrityException;
 import model.dao.ServiceDao;
 import model.entities.Service;
 
@@ -89,9 +90,21 @@ public class ServiceDaoJDBC  implements ServiceDao{
 	}
 
 	@Override
-	public void deleteById(Integer id) {
-		// TODO Auto-generated method stub
-		
+	public void deleteById(Integer id) 
+	{
+		// Metodo para deletar um registro (servico) pelo seu id
+		PreparedStatement st = null;
+		try {
+			st = conn.prepareStatement("DELETE FROM tb_service WHERE Service_Id = ?"); //query para deletar um registro
+			st.setInt(1, id); //seta o id para a query
+			st.executeUpdate(); //executa a query
+		} 
+		catch (SQLException e) {
+			throw new DbIntegrityException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override

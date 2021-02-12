@@ -2,6 +2,7 @@ package application;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import model.dao.DaoFactory;
 import model.dao.ServiceDao;
@@ -35,5 +36,13 @@ public class Program5
 		service.setValor(245.00);
 		serviceDao.update(service);
 		System.out.println("Updated completed");
+		
+		Scanner sc = new Scanner(System.in);
+		System.out.println("\n==Test delete");
+		System.out.print("Enter id for delete: ");
+		int id = sc.nextInt();
+		serviceDao.deleteById(id);
+		System.out.println("Delete completed");
+		sc.close();
 	}
 }
