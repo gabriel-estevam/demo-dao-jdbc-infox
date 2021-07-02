@@ -90,9 +90,55 @@ public class OrdemServicoDaoJDBC implements OrdemServicoDao
 	}
 
 	@Override
-	public OrdemServico findById(Integer id) {
-		// TODO Auto-generated method stub
+	public OrdemServico findById(Integer id) 
+	{
+		// metodopara retorna uma ordem de serviço pelo seu id
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		
+		try 
+		{
+			st = conn.prepareStatement("SELECT os.Ordem_id,\r\n" + 
+					"	   os.Ordem_Equipamento,\r\n" + 
+					"       os.Ordem_Defeito,\r\n" + 
+					"       os.Ordem_Inicial_Date,\r\n" + 
+					"       os.Ordem_Final_Date,\r\n" + 
+					"       os.Ordem_Laudo,\r\n" + 
+					"       os.Ordem_Status,\r\n" + 
+					"       cli.Client_Id,\r\n" + 
+					"       cli.Client_Name,\r\n" + 
+					"       svr.Service_Id,\r\n" + 
+					"       svr.Service_Name,\r\n" + 
+					"       svr.Service_Valor,\r\n" + 
+					"       emp.Employee_Id,\r\n" + 
+					"       emp.Employee_Name\r\n" + 
+					"FROM tb_ordem_servico AS os\r\n" + 
+					"INNER JOIN tb_client AS cli ON os.Client_Id = cli.Client_Id\r\n" + 
+					"INNER JOIN tb_service AS svr ON os.Service_Id = svr.Service_Id\r\n" + 
+					"INNER JOIN tb_employee AS emp ON os.Employee_Id = emp.Employee_Id\r\n" + 
+					"WHERE os.Ordem_Id = ?");
+			st.setInt(1, id);
+			rs = st.executeQuery();
+			if(rs.next()) 
+			{
+				Client client = instantiateClient(rs);
+				Service service = instantiateService(rs);
+				Employee employee = instantiateEmployee(rs);
+				OrdemServico obj = instantiateOrdemServico(rs, employee, service, client);
+				return obj;
+			}
+			
 		return null;
+		
+		} 
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally 
+		{
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+		}
 	}
 
 	@Override
@@ -119,4 +165,47 @@ public class OrdemServicoDaoJDBC implements OrdemServicoDao
 		return null;
 	} 
 
+
+	private OrdemServico instantiateOrdemServico(ResultSet rs, 
+			Employee employee, Service service, Client client) throws SQLException 
+	{
+		OrdemServico obj = new OrdemServico();
+		obj.setId(rs.getInt("Ordem_id"));
+		obj.setEquipamento(rs.getString("Ordem_Equipamento"));
+		obj.setDefeito(rs.getString("Ordem_Defeito"));
+		obj.setDtIncial(rs.getDate("Ordem_Inicial_Date"));
+		obj.setDtFinal(rs.getDate("Ordem_Final_Date"));
+		obj.setLaudo(rs.getString("Ordem_Laudo"));
+		obj.setStatus(rs.getString("Ordem_Status"));
+		obj.setEmployeeId(employee);
+		obj.setServiceId(service);
+		obj.setClientId(client);
+		return obj;
+	}
+
+	private Employee instantiateEmployee(ResultSet rs) throws SQLException 
+	{
+		Employee employee = new Employee();
+		employee.setId(rs.getInt("Employee_Id"));
+		employee.setName(rs.getString("Employee_Name"));
+		return employee;
+	}
+
+	private Service instantiateService(ResultSet rs) throws SQLException 
+	{
+		Service service = new Service();
+		service.setId(rs.getInt("service_Id"));
+		service.setName(rs.getString("Service_Name"));
+		service.setValor(rs.getDouble("Service_Valor"));
+		return service;
+	}
+
+	private Client instantiateClient(ResultSet rs) throws SQLException 
+	{
+		Client client = new Client();
+		client.setId(rs.getInt("Client_Id"));
+		client.setName(rs.getString("Client_Name"));
+		return client;
+	}
+	
 }
