@@ -207,9 +207,73 @@ public class OrdemServicoDaoJDBC implements OrdemServicoDao
 	}
 
 	@Override
-	public List<OrdemServico> findByEmployeeId(Employee employee) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<OrdemServico> findByEmployeeId(Employee employee) 
+	{
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try 
+		{
+			st = conn.prepareStatement(
+					"SELECT os.Ordem_id,\r\n" + 
+					"	   os.Ordem_Equipamento,\r\n" + 
+					"       os.Ordem_Defeito,\r\n" + 
+					"       os.Ordem_Inicial_Date,\r\n" + 
+					"       os.Ordem_Final_Date,\r\n" + 
+					"       os.Ordem_Laudo,\r\n" + 
+					"       os.Ordem_Status,\r\n" + 
+					"       cli.Client_Id,\r\n" + 
+					"       cli.Client_Name,\r\n" + 
+					"       svr.Service_Id,\r\n" + 
+					"       svr.Service_Name,\r\n" + 
+					"       svr.Service_Valor,\r\n" + 
+					"       emp.Employee_Id,\r\n" + 
+					"       emp.Employee_Name\r\n" + 
+					"FROM tb_ordem_servico AS os\r\n" + 
+					"INNER JOIN tb_client AS cli ON os.Client_Id = cli.Client_Id\r\n" + 
+					"INNER JOIN tb_service AS svr ON os.Service_Id = svr.Service_Id\r\n" + 
+					"INNER JOIN tb_employee AS emp ON os.Employee_Id = emp.Employee_Id\r\n" + 
+					"WHERE emp.Employee_Id = ?");
+			st.setInt(1, employee.getId());
+			rs = st.executeQuery();
+			
+			List<OrdemServico> list = new ArrayList<>();
+			Map<Integer, Client> mapClient = new HashMap<>();
+			Map<Integer, Service> mapService = new HashMap<>();
+			Map<Integer, Employee> mapEmployee = new HashMap<>();
+			
+			while(rs.next()) 
+			{
+				Client cli = mapClient.get(rs.getInt("Client_Id"));
+				Service srv = mapService.get(rs.getInt("Service_Id"));
+				Employee emp = mapEmployee.get(rs.getInt("Employee_Id"));
+				if(cli == null) {
+					cli = instantiateClient(rs);
+					mapClient.put(rs.getInt("Client_Id"), cli);
+				}
+				
+				 if(srv == null) {
+					srv = instantiateService(rs);
+					mapService.put(rs.getInt("Service_Id"), srv);
+				}
+				 
+				if(emp == null) {
+					emp = instantiateEmployee(rs);
+					mapService.put(rs.getInt("Service_Id"), srv);
+				}
+				OrdemServico os = instantiateOrdemServico(rs, emp, srv, cli); 
+				list.add(os);
+			}
+			return list;
+		} 
+		catch (SQLException e) 
+		{
+			throw new DbException(e.getMessage());
+		}
+		finally 
+		{
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+		}
 	}
 
 	@Override
