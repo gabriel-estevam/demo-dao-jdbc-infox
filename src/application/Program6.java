@@ -1,5 +1,8 @@
 package application;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import model.dao.DaoFactory;
 import model.dao.OrdemServicoDao;
 import model.entities.OrdemServico;
@@ -9,9 +12,15 @@ public class Program6 {
 	public static void main(String[] args)
 	{
 		OrdemServicoDao objDaoFactory = DaoFactory.createOrdemServicoDao();
-		OrdemServico obj = objDaoFactory.findById(1);
-		System.out.println("Test findById");
-		System.out.println(obj.toString());
+		//OrdemServico obj = objDaoFactory.findById(1);
+//		System.out.println("Test findById");
+//		System.out.println(obj.toString());
+		
+		List<OrdemServico> listAll = new ArrayList<OrdemServico>();
+		listAll = objDaoFactory.findAll();
+		for(OrdemServico ordemObj: listAll) {
+			System.out.println(ordemObj);
+		}
 //		Department dep = new Department(2, null);
 //		Employee emp = new Employee(3, "Alex grey", "alex@gmail.com",new Date(),null, 2000.00, dep);
 //		Service sc = new Service(7, null, null, null);

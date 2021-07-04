@@ -5,7 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import db.DB;
 import db.DbException;
@@ -142,9 +145,65 @@ public class OrdemServicoDaoJDBC implements OrdemServicoDao
 	}
 
 	@Override
-	public List<OrdemServico> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<OrdemServico> findAll() 
+	{
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try 
+		{
+			st = conn.prepareStatement(
+					"SELECT os.*,\r\n" + 
+					"		cli.Client_Name,\r\n" + 
+					"        svr.*,\r\n" +
+					"		  svr.Service_Valor,\r\n"+
+					"        emp.Employee_Name\r\n" + 
+					"FROM tb_ordem_servico AS os\r\n" + 
+					"INNER JOIN tb_client AS cli ON os.Client_Id = cli.Client_Id\r\n" + 
+					"INNER JOIN tb_service AS svr ON os.Service_Id = svr.Service_Id\r\n" + 
+					"INNER JOIN tb_employee AS emp ON os.Employee_Id = emp.Employee_Id\r\n" + 
+					"ORDER BY os.Ordem_Equipamento;");
+			rs = st.executeQuery();
+			
+			List<OrdemServico> list = new ArrayList<>(); //lista que sera retornada
+			//estutura map que vamos usar para mapear as classe instanciada
+			Map<Integer, Client> mapClient = new HashMap<>();
+			Map<Integer, Service> mapService = new HashMap<>();
+			Map<Integer, Employee> mapEmployee = new HashMap<>();
+			
+			while(rs.next()) 
+			{
+				Client cli = mapClient.get(rs.getInt("Client_Id"));
+				Service srv = mapService.get(rs.getInt("Service_Id"));
+				Employee emp = mapEmployee.get(rs.getInt("Employee_Id"));
+		/*na estrutura abaixo estamos testando se ja existe uma classe ja instanciada com
+		 * mesmo id, com isso economizamos instancia no heap da memoria*/	
+				if(cli == null) {
+					cli = instantiateClient(rs);
+					mapClient.put(rs.getInt("Client_Id"), cli);
+				}
+				 if(srv == null) {
+					srv = instantiateService(rs);
+					mapService.put(rs.getInt("Service_Id"), srv);
+				}
+				if(emp == null) {
+					emp = instantiateEmployee(rs);
+					mapEmployee.put(rs.getInt("Employee_Id"), emp);
+				}
+				
+				OrdemServico os = instantiateOrdemServico(rs, emp, srv, cli);
+				list.add(os); 
+			}
+			return list;
+		} 
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		
+		finally 
+		{
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+		}
 	}
 
 	@Override
